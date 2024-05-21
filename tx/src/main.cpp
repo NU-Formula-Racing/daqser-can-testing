@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#include <daqser.hpp>
-// #include <daqser_can.hpp>
+// #include <daqser.hpp>
+#include <daqser_can_test.hpp>
 #include <virtualTimer.h>
-#include <teensy_can.h>
+#include <CAN.h>
 
 #define VERSION_ARGS(major, minor, patch) major, minor, patch
 
@@ -18,26 +18,20 @@ VirtualTimerGroup timerGroup;
 // Called every 100ms
 void recordData()
 {
-  //  Prepare data from the CAN bus for serialization
-  // daqser::updateSignals();
-  // Serialize the data, and get the raw bytes
-  std::vector<std::uint8_t> byteData = daqser::serializeFrame();
-  // send the data over lora or something
-  // send(byteData);
+  std::cout << "Recording data" << std::endl;
+  daqser::sendSignals();
+  daqser::g_canBus.Tick();
 }
 
 void setup()
 {
-  Serial.begin(115200);
-  // Initialize the daqser library
-  daqser::initialize();
-  // Tell daqser what schema we are using to serialize the data
-  daqser::setSchema(SCHEMA_NAME, SCHEMA_VERSION);
-  // Tell daqser to record/send data from these boards
-  timerGroup.AddTimer(100, recordData);
+  Serial.begin(9600);
+  daqser::g_canBus.Initialize(ICAN::BaudRate::kBaud1M);
+  // Initialize the timer group
+  daqser::g_timerGroup.AddTimer(100, recordData);
 }
 
 void loop()
 {
-  timerGroup.Tick(millis());
+  daqser::g_timerGroup.Tick(millis());
 }
