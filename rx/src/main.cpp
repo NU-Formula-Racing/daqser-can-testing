@@ -15,6 +15,10 @@ void recordData()
 {
   //  Prepare data from the CAN bus for serialization
   daqser::updateSignals();
+}
+
+void reportData()
+{
   // Serialize the data, and get the raw bytes
   std::vector<std::uint8_t> byteData = daqser::serializeFrame();
   // send the data over lora or something
@@ -29,6 +33,7 @@ void recordData()
   Serial.println();
 }
 
+
 void setup()
 {
   Serial.begin(9600);
@@ -36,11 +41,16 @@ void setup()
   daqser::initialize();
   // Tell daqser what schema we are using to serialize the data
   daqser::setSchema(SCHEMA_NAME, SCHEMA_VERSION);
+  daqser::g_canBus.Initialize(ICAN::BaudRate::kBaud1M);
   // Tell daqser to record/send data from these boards
   timerGroup.AddTimer(100, recordData);
+  timerGroup.AddTimer(1000, reportData);
+  
+  daqser::initializeCAN();
 }
 
 void loop()
 {
   timerGroup.Tick(millis());
+  daqser::tickCAN();
 }
