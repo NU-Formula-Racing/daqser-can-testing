@@ -1,17 +1,12 @@
 #include <Arduino.h>
 #include <daqser.hpp>
-// #include <daqser_can.hpp>
+#include <daqser_can.hpp>
 #include <virtualTimer.h>
-#include <teensy_can.h>
 
 #define VERSION_ARGS(major, minor, patch) major, minor, patch
 
 #define SCHEMA_NAME "test_schema_v1.0.0.drive"
 #define SCHEMA_VERSION VERSION_ARGS(1, 0, 0)
-
-// Listen to boards
-// #define RX_BMS
-// #define RX_IMD
 
 VirtualTimerGroup timerGroup;
 // Function to record and send data
@@ -28,7 +23,7 @@ void recordData()
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   // Initialize the daqser library
   daqser::initialize();
   // Tell daqser what schema we are using to serialize the data
